@@ -2,6 +2,7 @@ import tkinter as tk
 from interface import AppInterface
 from busca_web import buscar_produtos
 from exel import salvar_dados, abrir_arquivo_excel
+from interagir_exel import mostrar_janela_exel
 
 """
 Função controladora acionada pelo botão de busca dos produtos.
@@ -51,7 +52,8 @@ def abrir_planilha():
 
 #em desenvolvimento atenção !!!
 def interagir_exel():
-    app.mostrar_mensagem("Info", "Função de interagir com Excel ainda não implementada.")
+    mostrar_janela_exel()
+    #app.mostrar_mensagem("Info", "Função de interagir com Excel ainda não implementada.")
 
 # --- Execução Principal ---
 if __name__ == "__main__":

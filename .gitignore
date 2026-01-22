@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# arquivo Excel gerado
+comparativo_precos.xlsx
