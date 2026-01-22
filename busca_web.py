@@ -5,8 +5,6 @@ from time import sleep
 
 def iniciar_driver():
     """Inicia o navegador maximizado"""
-    # Descomente a linha abaixo para rodar em modo 'headless' (sem janela)
-    # options.add_argument("--headless") 
     driver = webdriver.Chrome()
     driver.maximize_window()
     return driver
@@ -47,31 +45,36 @@ def buscar_produtos(loja, produto):
             
             # Busca
             try:
+                #pega a barra de busca e digita o produto
                 barra = driver.find_element(By.CLASS_NAME, "nav-search-input")
                 barra.clear()
                 barra.send_keys(produto)
+                #Tecla Enter
                 barra.send_keys(Keys.RETURN)
-            except Exception as e:
-                print(f"Erro na barra de busca ML: {e}")
+            except Exception:
+                print("Erro ao buscar no Mercado Livre.")
                 return []
 
+            #Tempo para carregar resultados
             sleep(3)
+
+            #função de scroll
             scroll_ate_o_fim(driver)
-            
-            # Captura Itens (Tenta pegar tanto layout antigo lista quanto layout novo grade)
+
+            # Captura Itens usando o item pesquisado
             items = driver.find_elements(By.CSS_SELECTOR, "li.ui-search-layout__item")
-            if not items:
-                items = driver.find_elements(By.CSS_SELECTOR, "div.poly-card")
             
             print(f"Encontrei {len(items)} items. Extraindo...")
-
+            
+            # percorre os itens encontrados 
             for item in items:
+                # delimita cada item inicialmente caso houver algum erro no processo imprimi ele com erro e pula para o próximo
                 try:
-                    titulo = "Sem Título"
-                    preco = "0"
+                    titulo = "Error"
+                    preco = "Error"
                     link = "#"
 
-                    # 1. TÍTULO
+                    # Extraindo titulo do produto
                     try:
                         titulo = item.find_element(By.CLASS_NAME, "poly-component__title").text
                     except:
@@ -80,32 +83,28 @@ def buscar_produtos(loja, produto):
                         except:
                             pass
 
-                    # 2. PREÇO
+                    # Extraindo o preço do produto
                     try:
-                        
                         preco_obj = item.find_elements(By.CLASS_NAME, "poly-price__current")
                         if preco_obj:
                             preco = preco_obj[0].find_element(By.CLASS_NAME, "andes-money-amount__fraction").text
                         else:
-                            
-                            preco_obj = item.find_elements(By.CLASS_NAME, "ui-search-price__second-line")
-                            if preco_obj:
-                                preco = preco_obj[0].find_element(By.CLASS_NAME, "andes-money-amount__fraction").text
-                            else:
-                                # Fallback genérico
                                 preco = item.find_element(By.CLASS_NAME, "andes-money-amount__fraction").text
                     except:
                         pass
 
-                    # 3. LINK
+                    # 3.extraindo o link do produto
                     try:
                         link = item.find_element(By.TAG_NAME, "a").get_attribute("href")
                     except:
                         pass
                     
-                    if titulo != "Sem Título":
+                    
+                    # Adiciona o resultado se o título for válido
+                    if titulo != "Error":
                         resultados.append([titulo, preco, link])
 
+                # Validação final para pular itens com erro e ver no exel
                 except Exception as e:
                     continue
 
@@ -118,26 +117,36 @@ def buscar_produtos(loja, produto):
 
             #busca todos os produtos
             try:
+                #pega a barra de busca e digita o produto
                 barra = driver.find_element(By.ID, "twotabsearchtextbox")
+                # Limpa a barra antes de digitar
                 barra.clear()
+
                 barra.send_keys(produto)
+                #Tecla Enter
                 barra.send_keys(Keys.RETURN)
-            except Exception as e:
-                print(f"Erro na barra de busca Amazon: {e}")
+
+            except Exception:
+                print("Erro ao buscar na Amazon, Barra de busca")
                 return []
 
             sleep(3)
-            scroll_ate_o_fim(driver) # Sua função de scroll
 
-            # --- CAPTURA ---
-            # O seletor do print está correto:
+            # Sua função de scroll passando a tela
+            scroll_ate_o_fim(driver) 
+
+            #tempo para carregar os produtos
+            sleep(3)
+
+            # Carrega todos os produtos de uma vez
             items = driver.find_elements(By.CSS_SELECTOR, 'div[data-component-type="s-search-result"]')
             print(f"Encontrei {len(items)} items na Amazon. Extraindo dados...")
 
+            #percorre os itens encontrados 
             for item in items:
                 try:
-                    titulo = "Sem Título"
-                    preco = "0"
+                    titulo = "Error"
+                    preco = "Error"
                     link = "#"
 
                     #pega o atributo alt da imagem
@@ -148,48 +157,43 @@ def buscar_produtos(loja, produto):
                         # Extrai o texto do atributo 'alt' usando get_atribute
                         titulo = imagem.get_attribute("alt")
 
-                        #removendo a frase Anuncio Patrocinado e -
+                        #removendo a frases "Anuncio Patrocinado e -"
                         titulo = titulo.replace("Anúncio", "").replace("patrocinado", "").replace("–", "").strip()
 
                     except Exception as e:
                         # print(f"Erro ao pegar título da imagem: {e}")
-                        titulo = "Sem Título"
+                        titulo = "Erro após pegar título da imagem"
                         
 
                     #Pega o preço
                     try:
-                        preco_oculto = item.find_element(By.CSS_SELECTOR, "span.a-offscreen")
-                        preco_completo = preco_oculto.get_attribute("textContent")
-                        
-                        # Limpa o R$ e espaços
+                        preco_completo = item.find_element(By.CSS_SELECTOR, "span.a-offscreen").get_attribute("textContent")
+                        # Limpa o R$ e espaços strip()
                         preco = preco_completo.replace("R$", "").replace("U$", "").strip()
                     except:
-                        # Se falhar, tenta o método visual (inteiro)
-                        try:
-                            preco = item.find_element(By.CLASS_NAME, "a-price-whole").text
-                        except:
-                            preco = "0"
+                        preco = "Erro ao pegar informação de preço"
 
                     #Pega o Link
                     try:
                         link_elem = item.find_element(By.CSS_SELECTOR, "a.s-no-outline")
                         link = link_elem.get_attribute("href")
                     except:
-                        #Coloca o preço como # para o codigo rodar
+                        #Coloca o preço como # para o codigo rodar caso houver erro
                         link = "#"
 
                     #adicionando a resultado
                     resultados.append([titulo, preco, link])
 
-                #Validação para Debug
-                except Exception as e:
-                    # print(f"Pulei um item: {e}") #descomente para debugar
+                #Validação final para pular itens com erro e ver no exel
+                except Exception:
                     continue
 
-    except Exception as e:
-        print(f"Erro Crítico: {e}")
+# Tratamento de erros gerais
+    except Exception :
+        print(f"Erro Crítico na busca de produtos na {loja}.")
     finally:
+        #fecha o navegador
         driver.quit()
-    
+    # Retorna os resultados encontrados
     return resultados
 
