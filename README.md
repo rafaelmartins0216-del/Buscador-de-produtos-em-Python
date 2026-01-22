@@ -35,12 +35,11 @@ Antes de começar, você precisará ter instalado em sua máquina:
 
 1. **Clone o repositório:**
 
-```bash
-git clone [https://github.com/seu-usuario/Buscador-de-produtos-em-Python.git](https://github.com/seu-usuario/Buscador-de-produtos-em-Python.git)
-cd Buscador-de-produtos-em-Python
+```
+git clone https://github.com/rafaelmartins0216-del/Buscador-de-produtos-em-Python.git
 ```
 
-2. **Instale as dependências das bibliotecas usando pip install:**
+2. **Instale as dependências das bibliotecas usando  pip install -r requirements.txt  pra baixar as dependencias:**
 
 3. Execute o projeto:
 ```
