@@ -43,12 +43,14 @@ def mostrar_janela_exel(master=None):
 
 
 def verificar_arquivo_excel():
-    """Verifica se o arquivo Excel existe e pode ser aberto."""
+    """Verifica se o arquivo Excel existe """
     arquivo = "comparativo_precos.xlsx"
     try:
         # Tenta abrir apenas para ver se existe e é válido
-        workbook = load_workbook(filename=arquivo)
+        workbook = load_workbook(arquivo)
         workbook.close()
+        print("Arquivo Encontrado e válido.")
+        messagebox.showinfo("Sucesso", f"O arquivo '{arquivo}' foi encontrado.")
         return True
     except FileNotFoundError:
         messagebox.showerror("Erro", f"Arquivo não encontrado:\n{arquivo}")
