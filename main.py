@@ -2,6 +2,7 @@ import tkinter as tk
 from interface import AppInterface
 from busca_web import buscar_produtos
 from exel import salvar_dados, abrir_arquivo_excel
+from interagir_exel import interagir_exel
 
 """
     Função controladora acionada pelo botão de busca dos produtos.
@@ -56,6 +57,6 @@ if __name__ == "__main__":
     janela = tk.Tk()
 
     # Passamos a janela e as funções para a interface
-    app = AppInterface(janela, executar_busca, abrir_planilha)
+    app = AppInterface(janela, executar_busca, abrir_planilha, interagir_exel)
     
     janela.mainloop()

@@ -10,7 +10,7 @@ class AppInterface:
     Classe principal da Interface Gráfica.
     """
 
-    def __init__(self, master, comando_buscar, comando_abrir):
+    def __init__(self, master, comando_buscar, comando_abrir, comando_interagir):
         #Função master (função principal da tela)
         self.master = master
         self.master.title("Buscador de Preços Modular")
@@ -56,7 +56,7 @@ class AppInterface:
         self.combo_loja = ttk.Combobox(input_frame, values=["Mercado Livre", "Amazon"], state="readonly", font=("Segoe UI", 10))
         self.combo_loja.grid(row=3, column=0, sticky="ew", pady=(0, 20))
 
-        # --- NOVO: Bind para verificar quando o usuário seleciona a loja ---
+        # Bind para verificar quando o usuário seleciona a loja ---
         self.combo_loja.bind("<<ComboboxSelected>>", self.verificar_campos)
 
         # Garante que a coluna se expanda se necessário
@@ -84,6 +84,14 @@ class AppInterface:
             state="disabled"  # Só será ativado após uma busca com sucesso
         )
         self.btn_abrir.pack(fill="x", pady=5)
+
+        # botão para interagir com exel
+        self.bnt_exel=ttk.Button(
+            btn_frame,
+            text="interagir com exel",
+            command=comando_interagir,
+            state="disabled" #so será ativado se tiver um exel criado
+        )
         
         # Barra de status
         self.lbl_status = tk.Label(self.main_frame, text="Selecione a loja e o produto...", bg="#ffffff", fg="#7f8c8d", font=("Segoe UI", 8))
