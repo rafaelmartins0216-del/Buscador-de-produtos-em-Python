@@ -1,2 +1,5 @@
-def interagir_exel():
-    return "teste"
+from openpyxl import load_workbook
+import tkinter as tk
+from main import app
+from tkinter import ttk, messagebox
+

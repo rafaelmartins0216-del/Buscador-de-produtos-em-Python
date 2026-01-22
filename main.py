@@ -2,11 +2,10 @@ import tkinter as tk
 from interface import AppInterface
 from busca_web import buscar_produtos
 from exel import salvar_dados, abrir_arquivo_excel
-from interagir_exel import interagir_exel
 
 """
-    Função controladora acionada pelo botão de busca dos produtos.
-    """
+Função controladora acionada pelo botão de busca dos produtos.
+"""
 def executar_busca(produto, loja):
     
     """Verifica se há produto"""
@@ -48,6 +47,11 @@ def abrir_planilha():
         abrir_arquivo_excel()
     except Exception as e:
         app.mostrar_mensagem("Erro", f"Não foi possível abrir o arquivo: {e}")
+
+
+#em desenvolvimento atenção !!!
+def interagir_exel():
+    app.mostrar_mensagem("Info", "Função de interagir com Excel ainda não implementada.")
 
 # --- Execução Principal ---
 if __name__ == "__main__":
