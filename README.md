@@ -39,9 +39,12 @@ Antes de começar, você precisará ter instalado em sua máquina:
 git clone https://github.com/rafaelmartins0216-del/Buscador-de-produtos-em-Python.git
 ```
 
-2. **Instale as dependências das bibliotecas usando  pip install -r requirements.txt  pra baixar as dependencias:**
+2. **Instale as dependências das bibliotecas usando:**
+```
+pip install -r requirements.txt
+```
 
-3. Execute o projeto:
+4. Execute o projeto:
 ```
 python main.py
 ```
