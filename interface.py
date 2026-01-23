@@ -82,7 +82,7 @@ class AppInterface:
             btn_frame,
             text="📊 Interagir com Excel",
             command=comando_interagir,
-            state="enabled"
+            state="disabled"
         )
         self.btn_excel.pack(fill="x", pady=5)
 

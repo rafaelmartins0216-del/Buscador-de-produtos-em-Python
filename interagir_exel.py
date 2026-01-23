@@ -25,9 +25,10 @@ def mostrar_janela_exel(master=None):
     )
     lbl_info.pack()
 
+    
     bnt_verificar = tk.Button(
         janela,
-        text="Verificar Existência do Arquivo Excel",
+        text="Somar Todos os Valores do Excel",
         font=fonte_geral,
         command=verificar_arquivo_excel
     )
