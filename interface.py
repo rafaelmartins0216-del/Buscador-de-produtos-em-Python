@@ -82,7 +82,7 @@ class AppInterface:
             btn_frame,
             text="📊 Interagir com Excel",
             command=comando_interagir,
-            state="disabled"
+            state="enabled"
         )
         self.btn_excel.pack(fill="x", pady=5)
 
@@ -96,6 +96,7 @@ class AppInterface:
         )
         self.lbl_status.pack(side="bottom", pady=10)
 
+    #verifica se os campos estão preenchidos
     def verificar_campos(self, event=None):
         produto = self.entrada_produto.get()
         loja = self.combo_loja.get()

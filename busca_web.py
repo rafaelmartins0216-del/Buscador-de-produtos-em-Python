@@ -167,11 +167,31 @@ def buscar_produtos(loja, produto):
 
                     #Pega o preço
                     try:
-                        preco_completo = item.find_element(By.CSS_SELECTOR, "span.a-offscreen").get_attribute("textContent")
-                        # Limpa o R$ e espaços strip()
-                        preco = preco_completo.replace("R$", "").replace("U$", "").strip()
-                    except:
-                        preco = "Erro ao pegar informação de preço"
+                        #bug não consegue pegar alguns preços de alguns produtos amazom varia muito como selecionar
+                        #Tentando vários seletores possíveis
+                        seletores_possiveis = [
+                            "span.a-price-whole",          
+                            "span.a-price.a-text-price",   
+                            "span.a-price-fraction"        
+                        ]
+
+                        #for in para percorrer os seletores
+                        for seletor in seletores_possiveis:
+                            preco_elementos = item.find_elements(By.CSS_SELECTOR, seletor)
+                            if preco_elementos:
+                                preco_texto= preco_elementos[0].text
+                                break
+                        
+                        #valinda se preco_texto foi encontrado e se foi pega o valor e convertido para float41
+                        if preco_texto:
+                            preco = preco_texto.replace(".", "").replace(",", ".").replace("R$","").strip()
+                            preco = float(preco)
+                        else:
+                            preco = "Erro ao pegar preço"
+
+                    except Exception :
+                        print(preco)
+
 
                     #Pega o Link
                     try:
