@@ -6,27 +6,37 @@ import os
 ARQUIVO_EXCEL = "comparativo_precos.xlsx"
 
 def tratar_preco(valor):
-    """Converte valor para float."""
+    """Converte valor monetário BR/US para float corretamente."""
+    
     if not valor:
         return 0.0
+
     if isinstance(valor, (int, float)):
         return float(valor)
 
-    valor_str = str(valor).strip()
-    # Remove símbolos de moeda e espaços
-    valor_str = valor_str.lower().replace('r$', '').replace('us$', '').strip()
+    valor_str = str(valor).strip().lower()
     
-    # Lógica para tratar milhar e decimal (padrão BR: 1.000,00)
-    if ',' in valor_str and '.' in valor_str:
-        valor_str = valor_str.replace('.', '') # Remove milhar
-        valor_str = valor_str.replace(',', '.') # Virgula vira ponto
-    elif ',' in valor_str:
-        valor_str = valor_str.replace(',', '.')
+    # Remove símbolos
+    valor_str = valor_str.replace('r$', '').replace('us$', '').strip()
+
+    # Caso padrão BR: 1.000,00
+    if ',' in valor_str:
+        valor_str = valor_str.replace('.', '')  # remove milhar
+        valor_str = valor_str.replace(',', '.')  # vírgula vira ponto
+    
+    # Caso só tenha ponto (ex: 6.948)
+    elif '.' in valor_str:
+        partes = valor_str.split('.')
+        
+        # Se parte depois do ponto tiver 3 dígitos → é milhar
+        if len(partes[-1]) == 3:
+            valor_str = valor_str.replace('.', '')
     
     try:
         return float(valor_str)
     except ValueError:
         return 0.0
+
 
 def formatar_planilha(ws, loja):
     """Aplica o css visual na aba."""
@@ -101,7 +111,8 @@ def formatar_planilha(ws, loja):
 def salvar_dados(dados, loja):
     """
     Salva os dados de uma loja específica. 
-    Se o arquivo já existe, adiciona ou atualiza a aba daquela loja.
+    Se o arquivo já existe, adiciona ou atualiza a aba daquela loja
+    Recebe dados e loja como parametro
     """
     if not dados:
         print(f"[{loja}] Nenhum dado para salvar.")
@@ -157,12 +168,11 @@ def salvar_dados(dados, loja):
     except PermissionError:
         print(f"\n[ERRO CRÍTICO] Não foi possível salvar '{ARQUIVO_EXCEL}'. Arquivo aberto?")
 
-"""Abrir arquivo exel"""
+
 def abrir_arquivo_excel():
-    """Tenta abrir o arquivo Excel no sistema operacional."""
+    """Tenta abrir o arquivo Excel no sistema operacional caso não abrir ele gera um erri"""
     if not os.path.exists(ARQUIVO_EXCEL):
-        print("Arquivo ainda não existe.")
-        return
+        raise "Arquivo não existe"
     print(f"Abrindo {ARQUIVO_EXCEL}...")
     os.startfile(ARQUIVO_EXCEL)
 
