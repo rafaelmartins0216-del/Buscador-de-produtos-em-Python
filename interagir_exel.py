@@ -91,71 +91,66 @@ def verificar_arquivo_excel():
         return False
     
 
-#soma os valores do excel
+from openpyxl import load_workbook
+from openpyxl.styles import Alignment
+from tkinter import messagebox
+
+
 def somar_valores_excel():
-    """Soma todos os valores numéricos na primeira planilha do arquivo Excel."""
-    
-    # Verifica se o arquivo Excel existe antes de prosseguir
+    """Soma apenas os valores da coluna de Preço (coluna B)."""
+
     if not verificar_arquivo_excel():
         return
 
     arquivo = "comparativo_precos.xlsx"
 
     try:
-        # Carrega o arquivo Excel
         workbook = load_workbook(arquivo)
-        # Pega a primeira planilha (fazer depois opção de escolher planilha opção valida somente para primeira planilha)
+        sheet = workbook.active
 
-        sheet = workbook.active  
+        soma_total = 0.0
 
-        
-        soma_total = 0
+        # Começa da linha 2 (pulando cabeçalho)
+        for row in sheet.iter_rows(min_row=2, min_col=2, max_col=2, values_only=True):
+            cell = row[0]
 
-        # Itera sobre todas as células na planilha e somente valores numéricos são somados
-        for row in sheet.iter_rows(values_only=True):
-            for cell in row:
-                # Verifica se a célula é um número (int ou float)
-                if isinstance(cell, (int, float)):
-                    soma_total += cell
-                    
+            if isinstance(cell, (int, float)):
+                soma_total += cell
+            elif isinstance(cell, str):
+                soma_total += tratar_preco(cell)
 
-        #Variavel css
+        # Estilo
         alinhar_centro = Alignment(horizontal="center", vertical="center")
 
-
-        soma_total = tratar_preco(soma_total)
-
-        #Redimensionando colunas para melhor visualização
+        # Ajuste de coluna
         sheet.column_dimensions['E'].width = 25
 
-        #Adicionando Dados na planilha
-        sheet["E3"] = "Soma Total do Valores:"
+        # Escreve resultado
+        sheet["E3"] = "Soma Total dos Valores:"
         sheet["E4"] = soma_total
 
-
-        #adicionando efeito na celula do excel
         sheet["E3"].alignment = alinhar_centro
         sheet["E4"].alignment = alinhar_centro
 
+        # Formatação monetária no Excel
+        sheet["E4"].number_format = 'R$ #,##0.00'
 
-        #Feito Cedula
+        # Salva antes de fechar
+        workbook.save(arquivo)
         workbook.close()
-        messagebox.showinfo("Resultado", f"A soma total dos preços é: {soma_total}")
 
-        workbook.save("comparativo_precos.xlsx")
+        messagebox.showinfo("Resultado", f"A soma total dos preços é: R$ {soma_total:,.2f}")
 
-    #exceção genérica
-    except:
-        messagebox.showerror("Erro", "Ocorreu um erro ao processar o arquivo Excel.")
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
 
 
 
 
-#Retorna o menor valor do excel
+
 def menor_valor_excel():
-    """Retorna o menor valor numérico na primeira planilha do arquivo Excel."""
-    
-    # Verifica se o arquivo Excel existe antes de prosseguir
+    """Escreve o menor valor da coluna de Preço ao lado da Soma Total."""
+
     if not verificar_arquivo_excel():
         return
 
@@ -163,38 +158,53 @@ def menor_valor_excel():
 
     try:
         workbook = load_workbook(arquivo)
-        # Pega a primeira planilha (fazer depois opção de escolher planilha)
-        sheet = workbook.active  
+        sheet = workbook.active
 
         menor_valor = None
 
-        # Itera sobre todas as células na planilha para encontrar o menor valor numérico
-        for row in sheet.iter_rows(values_only=True):
-            for cell in row:
-                if isinstance(cell, (int, float)):
-                    if menor_valor is None or cell < menor_valor:
-                        menor_valor = cell
+        # Percorre somente a coluna B (Preço), ignorando cabeçalho
+        for row in sheet.iter_rows(min_row=2, min_col=2, max_col=2, values_only=True):
+            cell = row[0]
 
-        #converte o valor para float formatado para o exel
-        menor_valor = tratar_preco(menor_valor)
+            if isinstance(cell, (int, float)):
+                valor = float(cell)
+            elif isinstance(cell, str):
+                valor = tratar_preco(cell)
+            else:
+                continue
 
-        #Variavel css
+            if menor_valor is None or valor < menor_valor:
+                menor_valor = valor
+
+        if menor_valor is None:
+            messagebox.showinfo("Resultado", "Nenhum valor numérico encontrado.")
+            workbook.close()
+            return
+
         alinhar_centro = Alignment(horizontal="center", vertical="center")
 
-        #Redimensionando colunas para melhor visualização
-        sheet.column_dimensions['F'].width = 25
+        # Ajusta largura da coluna G
+        sheet.column_dimensions['G'].width = 20
 
-        #Fecha a cedula
+        # Escreve ao lado da soma
+        sheet["G3"] = "Menor Valor:"
+        sheet["G4"] = menor_valor
+
+        sheet["G3"].alignment = alinhar_centro
+        sheet["G4"].alignment = alinhar_centro
+
+        # Formato moeda
+        sheet["G4"].number_format = 'R$ #,##0.00'
+
+        workbook.save(arquivo)
         workbook.close()
 
-        if menor_valor is not None:
-            messagebox.showinfo("Resultado", f"O menor Preço é: {menor_valor}")
-        else:
-            messagebox.showinfo("Resultado", "Nenhum valor numérico encontrado na planilha.")
+        messagebox.showinfo("Resultado", f"O menor preço é: R$ {menor_valor:,.2f}")
 
-    #exceção genérica
-    except:
-        messagebox.showerror("Erro", "Ocorreu um erro ao processar o arquivo Excel.")
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
+
+
 
 
 def tratar_preco(valor):
