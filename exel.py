@@ -19,16 +19,13 @@ def tratar_preco(valor):
     # Remove símbolos
     valor_str = valor_str.replace('r$', '').replace('us$', '').strip()
 
-    # Caso padrão BR: 1.000,00
     if ',' in valor_str:
         valor_str = valor_str.replace('.', '')  # remove milhar
         valor_str = valor_str.replace(',', '.')  # vírgula vira ponto
-    
-    # Caso só tenha ponto (ex: 6.948)
+
     elif '.' in valor_str:
         partes = valor_str.split('.')
         
-        # Se parte depois do ponto tiver 3 dígitos → é milhar
         if len(partes[-1]) == 3:
             valor_str = valor_str.replace('.', '')
     

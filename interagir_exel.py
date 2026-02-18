@@ -197,30 +197,34 @@ def menor_valor_excel():
         messagebox.showerror("Erro", "Ocorreu um erro ao processar o arquivo Excel.")
 
 
-#converte valores para float
 def tratar_preco(valor):
-    """Converte valor para float."""
+    """Converte valor monetário BR/US para float corretamente."""
+    
     if not valor:
         return 0.0
+
     if isinstance(valor, (int, float)):
         return float(valor)
 
-    valor_str = str(valor).strip()
-    # Remove símbolos de moeda e espaços
-    valor_str = valor_str.lower().replace('r$', '').replace('us$', '').strip()
+    valor_str = str(valor).strip().lower()
     
-    # Lógica para tratar milhar e decimal (padrão BR: 1.000,00)
-    if ',' in valor_str and '.' in valor_str:
-        valor_str = valor_str.replace('.', '') # Remove milhar
-        valor_str = valor_str.replace(',', '.') # Virgula vira ponto
-    elif ',' in valor_str:
-        valor_str = valor_str.replace(',', '.')
+    # Remove símbolos
+    valor_str = valor_str.replace('r$', '').replace('us$', '').strip()
+
+    if ',' in valor_str:
+        valor_str = valor_str.replace('.', '')  # remove milhar
+        valor_str = valor_str.replace(',', '.')  # vírgula vira ponto
+
+    elif '.' in valor_str:
+        partes = valor_str.split('.')
+        
+        if len(partes[-1]) == 3:
+            valor_str = valor_str.replace('.', '')
     
     try:
         return float(valor_str)
     except ValueError:
         return 0.0
-    
 
 
 #função abrir arquivo excel
