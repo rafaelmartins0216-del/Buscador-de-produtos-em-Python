@@ -68,7 +68,7 @@ def mostrar_janela_exel(master=None):
     ).pack(pady=6)
 
     criar_botao(
-        "Retornar o produto mais barato e seu valor",
+        "Retornar o produto mais barato",
         retornar_produto_mais_barato
     ).pack(pady=6)
 
