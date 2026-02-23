@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 import tkinter as tk
 from tkinter import ttk, messagebox
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import  Alignment
 import os
 
 def mostrar_janela_exel(master=None):
@@ -9,7 +9,7 @@ def mostrar_janela_exel(master=None):
 
     janela = tk.Toplevel(master)
     janela.title("Interagir com Excel")
-    janela.geometry("500x450")
+    janela.geometry("600x500")
     janela.configure(bg="#f5f7fa")
     janela.resizable(False, False)
 
@@ -68,6 +68,11 @@ def mostrar_janela_exel(master=None):
     ).pack(pady=6)
 
     criar_botao(
+        "Retornar o produto mais barato e seu valor",
+        retornar_produto_mais_barato
+    ).pack(pady=6)
+
+    criar_botao(
         "Abrir Arquivo Excel",
         abrir_arquivo_excel
     ).pack(pady=6)
@@ -85,78 +90,12 @@ def mostrar_janela_exel(master=None):
         fg="white",
         activebackground="#be123c",
         relief="flat",
-        height=2,
+        height=4,
         width=20,
-        cursor="hand2"
+        cursor="hand2",
     )
     btn_fechar.pack()
-    """Mostra uma janela simples informando que a função está em desenvolvimento."""
-    
-    janela = tk.Toplevel(master)
-    janela.title("Interagir com Excel")
-    janela.geometry("600x500")
-    janela.configure(bg="#f0f2f5")
-    janela.resizable(False, False)
 
-    # Commando pra fixar a janela na frente
-    janela.attributes('-topmost', True)
-
-
-    fonte_geral = ("Segoe UI", 10)
-
-
-    # botao para somar valores do excel
-    bnt_verificar = tk.Button(
-        janela,
-        text="Somar Todos os Valores do Excel",
-        font=fonte_geral,
-        command=somar_valores_excel
-    )
-    bnt_verificar.pack(pady=10)
-
-
-    # botao para retornar o menor valor do excel
-    bnt_menor = tk.Button(
-        janela,
-        text="Retornar o Menor Valor do Excel",
-        font=fonte_geral,
-        command=menor_valor_excel
-    )
-    bnt_menor.pack(pady=10)
-
-    #botão para retornar maior valor do exel
-    bnt_maior=tk.Button(
-        janela,
-        text="Retornar o Maior Valor",
-        font=fonte_geral,
-        command=maior_valor_exel
-    )
-
-    bnt_maior.pack(pady=10)
-
-
-    #botão paraabrir o arquivo excel
-    btn_abrir_excel = tk.Button(
-        janela,
-        text="Abrir Arquivo Excel",
-        font=fonte_geral,
-        command=abrir_arquivo_excel
-    )
-    btn_abrir_excel.pack(pady=10)
-
-
-    # Botão para fechar a janela
-    btn_fechar = tk.Button(
-        janela,
-        text="Fechar",
-        command=janela.destroy,
-        font=fonte_geral
-    )
-
-    btn_fechar.pack(side="bottom", pady=20)
-
-
-#verifica se o arquivo excel existe
 def verificar_arquivo_excel():
     """Verifica se o arquivo Excel existe """
 
@@ -177,8 +116,6 @@ def verificar_arquivo_excel():
     except Exception as e:
         messagebox.showerror("Erro", f"Erro ao abrir o arquivo:\n{e}")
         return False
-    
-
 
 def somar_valores_excel():
     """Soma apenas os valores da coluna de Preço (coluna B).
@@ -230,8 +167,6 @@ def somar_valores_excel():
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
 
-
-
 def maior_valor_exel():
     """Escreve o maior valor da coluna de Preço ao lado da Soma Total."""
 
@@ -281,8 +216,6 @@ def maior_valor_exel():
 
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
-
-
 
 def menor_valor_excel():
     """Escreve o menor valor da coluna de Preço ao lado da Soma Total."""
@@ -334,8 +267,6 @@ def menor_valor_excel():
     except Exception as e:
         messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
 
-
-
 def tratar_preco(valor):
     """Converte valor monetário BR para float corretamente."""
     
@@ -365,11 +296,56 @@ def tratar_preco(valor):
     except ValueError:
         return 0.0
 
-
-#função abrir arquivo excel
 def abrir_arquivo_excel():
     """Abre o arquivo Excel usando o aplicativo padrão do sistema."""
     try:
         os.startfile("comparativo_precos.xlsx")
     except:
         messagebox.showerror("Erro", "Não foi possível abrir o arquivo Excel verifique se ele existe.")
+
+def retornar_produto_mais_barato():
+    if not verificar_arquivo_excel():
+        return
+
+    arquivo = "comparativo_precos.xlsx"
+
+    try:
+        workbook = load_workbook(arquivo)
+        sheet = workbook.active
+        
+        nome_produto=sheet['A3']
+        preco_produto=sheet['B3']
+
+        print(nome_produto.value , preco_produto.value)
+        
+
+        # Estilo
+        alinhar_centro = Alignment(horizontal="center", vertical="center",wrap_text=True)
+
+        # Ajuste de coluna
+        sheet.column_dimensions['E'].width = 30
+        sheet.column_dimensions['F'].width = 15
+
+        # Escreve resultado
+        sheet["E6"] = "Produto mais Barato:"
+        sheet["E7"] = nome_produto.value
+        sheet["F6"]="Valor"
+        sheet["F7"]=preco_produto.value
+
+        sheet["F6"].alignment = alinhar_centro
+        sheet["F7"].alignment = alinhar_centro
+        sheet["E6"].alignment = alinhar_centro
+        sheet["E7"].alignment = alinhar_centro
+
+        # Formatação monetária no Excel
+        sheet["F7"].number_format = 'R$ #,##0.00'
+
+        # Salva antes de fechar
+        workbook.save(arquivo)
+        workbook.close()
+
+        messagebox.showinfo("Resultado", f"O produto mais barato\n\n{nome_produto.value}\nPreçoR$:{preco_produto.value:,.2f}")
+
+    except Exception as e:
+        messagebox.showerror("Erro", f"Ocorreu um erro: {e}")
+

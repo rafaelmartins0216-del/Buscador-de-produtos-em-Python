@@ -114,6 +114,9 @@ def salvar_dados(dados, loja):
     if not dados:
         print(f"[{loja}] Nenhum dado para salvar.")
         return
+    
+    #organiza do menor produto para o maior em questão de preco
+    dados = sorted(dados, key=lambda x: tratar_preco(x[1]))
 
     # Carrega o arquivo ou cria se ele ja existe
     if os.path.exists(ARQUIVO_EXCEL):

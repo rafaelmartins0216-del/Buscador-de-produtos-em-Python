@@ -50,11 +50,6 @@ def abrir_planilha():
         app.mostrar_mensagem("Erro", f"Não foi possível abrir o arquivo: {e}")
 
 
-#em desenvolvimento atenção !!!
-def interagir_exel():
-    mostrar_janela_exel()
-    #app.mostrar_mensagem("Info", "Função de interagir com Excel ainda não implementada.")
-
 # --- Execução Principal ---
 if __name__ == "__main__":
     """
@@ -63,6 +58,6 @@ if __name__ == "__main__":
     janela = tk.Tk()
 
     # Passamos a janela e as funções para a interface
-    app = AppInterface(janela, executar_busca, abrir_planilha, interagir_exel)
+    app = AppInterface(janela, executar_busca, abrir_planilha, mostrar_janela_exel)
     
     janela.mainloop()
